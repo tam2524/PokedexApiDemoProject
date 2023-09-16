@@ -51,11 +51,16 @@
                 </ul>
                 <h3 class="text-3xl font-semibold mt-4">Species:</h3>
                 <p>{{ pokemon.species }}</p>
+                <h3 class="text-xl font-semibold mt-4">Versions:</h3>
+                <ul>
+                    <li v-for="version in pokemon.versions" :key="version">{{ version }}</li>
+                </ul>
             </div>
             <div v-else class="bg-white rounded-lg p-4">
                 SEARCH A POKEMON!
             </div>
         </div>
+        
     </div>
     </div>
     <script type="text/javascript">
@@ -82,12 +87,15 @@
                             throw new Error(`POKEMON ERROR! Status: ${response.status}`);
                         }
                         const data = await response.json();
+                        const genderRate = data.gender_rate;
+                        const versionNames = data.game_indices.map(index => index.version.name);
                         this.pokemon = {
                             name: data.name,
                             imageUrl: data.sprites.other['official-artwork'].front_default,
                             characteristics: data.types.map(type => type.type.name),
                             abilities: data.abilities.map(ability => ability.ability.name),
                             species: data.species.name,
+                            versions: versionNames,
                         };
                     } catch (error) {
                         console.error(error);
@@ -96,14 +104,16 @@
                     }
                 },
                 nextPage() {
-                    this.offset += 20;
-                    this.searchMethod = '';
-                    this.searchPokemon();
+                    if (this.offset + 20 < this.totalResults) {
+                        this.offset += 20;
+                        this.searchQuery = '';
+                        this.searchPokemon();
+                    }
                 },
                 prevPage() {
                     if (this.offset >= 20) {
                         this.offset -= 20;
-                        this.searchMethod = '';
+                        this.searchQuery = '';
                         this.searchPokemon();
                     }
                 },
