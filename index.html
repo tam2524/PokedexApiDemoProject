@@ -87,7 +87,6 @@
                             throw new Error(`POKEMON ERROR! Status: ${response.status}`);
                         }
                         const data = await response.json();
-                        const genderRate = data.gender_rate;
                         const versionNames = data.game_indices.map(index => index.version.name);
                         this.pokemon = {
                             name: data.name,
