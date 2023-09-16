@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Finder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body class="bg-indigo-600 flex h-screen">
+    <div id="app" class="container mx-auto mt-8 p-4">
+        <div class="flex items-center">
+            <img src="https://1000logos.net/wp-content/uploads/2017/05/Pokemon-Logo.png" alt="Pokemon Logo" class="w-92 h-72 mr-2" >
+        </div>
+   
+        <div class="hidden sm:mb-5 sm:flex sm:justify-center lg:justify-start">
+            <a href="#"
+               class="flex items-center rounded-full bg-black p-1 pr-2 text-white hover:text-gray-200 sm:text-base lg:text-sm xl:text-base">
+                <span class="rounded-full bg-indigo-500 px-3 py-0.5 text-sm font-semibold leading-5 text-white">POKEMON API</span>
+                <svg class="ml-2 h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"
+                     aria-hidden="true">
+                    <path fill-rule="evenodd"
+                          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                          clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </div>
+        
+        
+        <div class="flex mb-4">
+            <input v-model="searchMethod" @input="searchPokemon" class="w-64 p-2 rounded-l focus:outline-none" placeholder="Type...">
+            <button @click="prevPage" class="p-2 bg-black text-white rounded-l-none">Previous</button>
+            <button @click="nextPage" class="p-2 bg-black text-white rounded-r">Next</button>
+        </div>  
+
+            
+        <div v-if="loading" class="text-center">
+            Pokemon GOOO!...
+        </div>
+        <div v-else>
+            <div v-if="pokemon" class="bg-white rounded-lg p-4">
+                <h2 class="text-3xl font-semibold">{{ pokemon.name }}</h2>
+                <img :src="pokemon.imageUrl" :alt="pokemon.name" class="mx-auto mt-4" style="max-width: 800px;">
+                <h3 class="text-3xl font-semibold mt-4">Characteristics:</h3>
+                <ul>
+                    <li v-for="characteristic in pokemon.characteristics" :key="characteristic">{{ characteristic }}</li>
+                </ul>
+                <h3 class="text-3xl font-semibold mt-4">Abilities:</h3>
+                <ul>
+                    <li v-for="ability in pokemon.abilities" :key="ability">{{ ability }}</li>
+                </ul>
+                <h3 class="text-3xl font-semibold mt-4">Species:</h3>
+                <p>{{ pokemon.species }}</p>
+            </div>
+            <div v-else class="bg-white rounded-lg p-4">
+                SEARCH A POKEMON!
+            </div>
+        </div>
+    </div>
+    </div>
+    <script type="text/javascript">
+        const app = Vue.createApp({
+            data() {
+                return {
+                    searchMethod: '',
+                    loading: false,
+                    pokemon: null,
+                    offset: 0,
+                };
+            },
+            computed: {
+                apiUrl() {
+                    return `https://pokeapi.co/api/v2/pokemon/${this.searchMethod.toLowerCase()}`;
+                },
+            },
+            methods: {
+                async searchPokemon() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch(this.apiUrl);
+                        if (!response.ok) {
+                            throw new Error(`POKEMON ERROR! Status: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        this.pokemon = {
+                            name: data.name,
+                            imageUrl: data.sprites.other['official-artwork'].front_default,
+                            characteristics: data.types.map(type => type.type.name),
+                            abilities: data.abilities.map(ability => ability.ability.name),
+                            species: data.species.name,
+                        };
+                    } catch (error) {
+                        console.error(error);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                nextPage() {
+                    this.offset += 20;
+                    this.searchMethod = '';
+                    this.searchPokemon();
+                },
+                prevPage() {
+                    if (this.offset >= 20) {
+                        this.offset -= 20;
+                        this.searchMethod = '';
+                        this.searchPokemon();
+                    }
+                },
+            },
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>
