@@ -29,10 +29,10 @@
         <div class="flex mb-4">
             <input v-model="searchMethod" @input="searchPokemon" class="w-64 p-2 rounded-l focus:outline-none" placeholder="Get Pokemon...">
         </div> 
-        
+         
         <div class="flex mb-4">
-            <button @click="prevPokemon" class="p-2 bg-blue-500 text-white rounded-l">Previous</button>
-            <button @click="nextPokemon" class="p-2 bg-blue-500 text-white rounded-r">Next</button>
+            <button @click="prevPokemon" class="p-2 bg-black-500 text-white rounded-l">Previous</button>
+            <button @click="nextPokemon" class="p-2 bg-black-500 text-white rounded-r">Next</button>
         </div>
             
         <div v-if="loading" class="text-center">
